@@ -1,0 +1,22 @@
+# Root-level gitignore — prevents accidentally committing nested artifacts
+
+# Never commit node_modules from either project
+fundnest-backend/node_modules/
+fundnest-frontend/node_modules/
+
+# Never commit environment files with secrets
+fundnest-backend/.env
+fundnest-frontend/.env
+
+# Nested git repos (Lovable workspace)
+fundnest-frontend/.workspace/
+
+# Build outputs
+fundnest-frontend/.output/
+fundnest-frontend/dist/
+
+# OS / IDE artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

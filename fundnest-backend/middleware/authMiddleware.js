@@ -1,40 +1,70 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
+import ApiError from '../utils/ApiError.js';
+import asyncHandler from '../utils/asyncHandler.js';
 
-const protect = async (req, res, next) => {
-    let token;
-
-    try {
-        // STEP A: Check if header exists
-        if (
-            req.headers.authorization &&
-            req.headers.authorization.startsWith('Bearer')
-        ) {
-            // STEP B: Extract token
-            token = req.headers.authorization.split(' ')[1];
-
-            // STEP C: Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // STEP D: Get user from DB
-            const user = await User.findById(decoded.id).select('-password');
-
-            // STEP E: Check user exists
-            if (!user) {
-                return res.status(401).json({ message: 'User not found' });
-            }
-
-            // STEP F: Attach user to request
-            req.user = user;
-
-            // STEP G: Go to next
-            next();
-        } else {
-            res.status(401).json({ message: 'No token, authorization denied' });
-        }
-    } catch (error) {
-        res.status(401).json({ message: 'Token is not valid' });
-    }
+// Mapping legacy roles for seamless backward compatibility
+const mapRole = (role) => {
+    if (role === 'user') return 'investor';
+    return role;
 };
 
-export { protect };
+const authenticate = asyncHandler(async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith('Bearer ')) {
+        throw new ApiError(401, 'Not authorized — no token provided');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+        throw new ApiError(401, 'Not authorized — invalid token format');
+    }
+
+    let decoded;
+
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            throw new ApiError(401, 'Session expired — please refresh token or login again');
+        }
+        throw new ApiError(401, 'Not authorized — invalid token');
+    }
+
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+        throw new ApiError(401, 'User no longer exists');
+    }
+
+    if (!user.isActive) {
+        throw new ApiError(403, 'Account has been deactivated');
+    }
+
+    req.user = user;
+    next();
+});
+
+// Alias protect to authenticate for backward compatibility with existing route imports
+const protect = authenticate;
+
+const authorize = (...roles) =>
+    asyncHandler(async (req, res, next) => {
+        const userRole = mapRole(req.user.role);
+        
+        // Normalize role values to lowercase for case-insensitivity
+        const normalizedRoles = roles.map(r => r.toLowerCase());
+        const normalizedUserRole = userRole.toLowerCase();
+
+        if (!normalizedRoles.includes(normalizedUserRole)) {
+            throw new ApiError(
+                403,
+                `Role '${req.user.role}' is not authorized to access this resource`
+            );
+        }
+        next();
+    });
+
+export { authenticate, protect, authorize };
