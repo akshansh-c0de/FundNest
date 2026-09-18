@@ -8,18 +8,25 @@ import {
     getStartupTransactions,
     cancelTransaction,
     getPortfolio,
+    getEscrowLedger,
 } from '../controllers/transactionController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validateCreateTransaction } from '../validators/platformValidators.js';
 
 const router = express.Router();
 
 // All transaction routes require authentication
 router.use(protect);
 
+// @route   GET /api/transactions/escrow-ledger/:startupId
+// @desc    Get transparent escrow balance and release ledger for a startup
+// @access  Private
+router.get('/escrow-ledger/:startupId', getEscrowLedger);
+
 // @route   POST /api/transactions
 // @desc    Create a new investment transaction
 // @access  Private (Investor only)
-router.post('/', createTransaction);
+router.post('/', validateCreateTransaction, createTransaction);
 
 // @route   GET /api/transactions
 // @desc    Get all transactions for current user

@@ -19,7 +19,8 @@ import aiRoutes from './routes/aiRoutes.js';
 import bookmarkRoutes from './routes/bookmarkRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 
-import { seedStartups } from './controllers/startupController.js';
+import { seedStartups, getStartupMatches } from './controllers/startupController.js';
+import { authenticate } from './middleware/authMiddleware.js';
 import { authRateLimiter } from './middleware/rateLimitMiddleware.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
@@ -34,10 +35,30 @@ const app = express();
 // Secure HTTP headers with Helmet
 app.use(helmet());
 
-// Hardened CORS Configuration
+// Hardened Dynamic CORS Configuration
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:8080',
+    'http://127.0.0.1:3000',
+].filter(Boolean);
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        origin: (origin, callback) => {
+            if (
+                !origin ||
+                allowedOrigins.includes(origin) ||
+                (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:')) ||
+                (process.env.NODE_ENV !== 'production' && origin.startsWith('http://127.0.0.1:'))
+            ) {
+                return callback(null, true);
+            }
+            callback(new Error('Not allowed by CORS'));
+        },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
@@ -65,6 +86,10 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/documents', documentRoutes);
+
+// Semantic Investor-Startup Matching direct endpoint (OpenAI Embeddings)
+app.get('/api/matches/:investorId', authenticate, getStartupMatches);
+app.get('/api/matches', authenticate, getStartupMatches);
 
 
 app.use(notFound);

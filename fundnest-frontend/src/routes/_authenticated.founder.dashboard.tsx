@@ -21,24 +21,30 @@ function Page() {
     queryFn: () => startupsApi.getFounderAnalytics(),
   });
 
-  const analytics = analyticsRes?.data?.analytics ?? {
-    totalStartups: 0,
-    totalTargetAmount: 0,
-    totalRaisedAmount: 0,
-    totalInvestors: 0,
-    averageFundingProgress: 0,
-    startupsByStatus: { Pending: 0, Approved: 0, Rejected: 0, Closed: 0 },
-    recentActivity: [],
-    startupBreakdown: [],
+  const rawAnalytics = analyticsRes?.data?.analytics;
+  const analytics = {
+    totalStartups: rawAnalytics?.totalStartups ?? 0,
+    totalTargetAmount: rawAnalytics?.totalTargetAmount ?? 0,
+    totalRaisedAmount: rawAnalytics?.totalRaisedAmount ?? 0,
+    totalInvestors: rawAnalytics?.totalInvestors ?? 0,
+    averageFundingProgress: rawAnalytics?.averageFundingProgress ?? 0,
+    startupsByStatus: {
+      Pending: rawAnalytics?.startupsByStatus?.Pending ?? 0,
+      Approved: rawAnalytics?.startupsByStatus?.Approved ?? 0,
+      Rejected: rawAnalytics?.startupsByStatus?.Rejected ?? 0,
+      Closed: rawAnalytics?.startupsByStatus?.Closed ?? 0,
+    },
+    recentActivity: rawAnalytics?.recentActivity ?? [],
+    startupBreakdown: rawAnalytics?.startupBreakdown ?? [],
   };
 
   const activeCampaigns = analytics.startupBreakdown.filter((s: any) => s.status === "Approved" || s.status === "Pending").length;
 
   // Prepare data for bar chart
   const chartData = analytics.startupBreakdown.map((s: any) => ({
-    name: s.name.substring(0, 12),
-    raised: s.raisedAmount,
-    target: s.targetAmount,
+    name: s.name?.substring(0, 12) || "Startup",
+    raised: s.raisedAmount || 0,
+    target: s.targetAmount || 0,
   }));
 
   if (isLoading) {
@@ -58,15 +64,17 @@ function Page() {
     );
   }
 
+  const pendingCount = analytics.startupsByStatus?.Pending ?? 0;
+
   return (
     <>
       <PageHeader title="Founder dashboard" subtitle="Monitor your raises and investor traction." />
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total raised" value={`$${analytics.totalRaisedAmount.toLocaleString()}`} change="Across all campaigns" icon={<DollarSign className="h-4 w-4" />} accent="success" />
-        <StatCard label="Active campaigns" value={String(activeCampaigns)} change={`${analytics.startupsByStatus.Pending} pending approval`} icon={<Megaphone className="h-4 w-4" />} />
-        <StatCard label="Total investors" value={String(analytics.totalInvestors)} change="Unique backers" icon={<Users className="h-4 w-4" />} />
-        <StatCard label="Avg progress" value={`${analytics.averageFundingProgress}%`} change="Across all campaigns" icon={<Activity className="h-4 w-4" />} />
+        <StatCard label="Total raised" value={`$${(analytics.totalRaisedAmount || 0).toLocaleString()}`} change="Across all campaigns" icon={<DollarSign className="h-4 w-4" />} accent="success" />
+        <StatCard label="Active campaigns" value={String(activeCampaigns)} change={`${pendingCount} pending approval`} icon={<Megaphone className="h-4 w-4" />} />
+        <StatCard label="Total investors" value={String(analytics.totalInvestors || 0)} change="Unique backers" icon={<Users className="h-4 w-4" />} />
+        <StatCard label="Avg progress" value={`${analytics.averageFundingProgress || 0}%`} change="Across all campaigns" icon={<Activity className="h-4 w-4" />} />
       </div>
 
       {analytics.totalStartups === 0 ? (

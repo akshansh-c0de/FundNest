@@ -3,9 +3,29 @@ import { Server } from 'socket.io';
 let io;
 
 export const initializeSocket = (server) => {
+    const allowedOrigins = [
+        process.env.CLIENT_URL,
+        'http://localhost:5173',
+        'http://localhost:8080',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:8080',
+        'http://127.0.0.1:3000',
+    ].filter(Boolean);
+
     io = new Server(server, {
         cors: {
-            origin: process.env.CLIENT_URL || 'http://localhost:5173',
+            origin: (origin, callback) => {
+                if (
+                    !origin ||
+                    allowedOrigins.includes(origin) ||
+                    (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:')) ||
+                    (process.env.NODE_ENV !== 'production' && origin.startsWith('http://127.0.0.1:'))
+                ) {
+                    return callback(null, true);
+                }
+                callback(new Error('Not allowed by CORS'));
+            },
             methods: ['GET', 'POST'],
             credentials: true,
         },

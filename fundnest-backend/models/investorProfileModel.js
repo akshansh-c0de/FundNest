@@ -57,6 +57,12 @@ const investorProfileSchema = new mongoose.Schema(
                 ref: 'Startup',
             },
         ],
+        // Cached OpenAI text-embedding-3-small (1536 dims)
+        preferenceEmbedding: {
+            type: [Number],
+            default: undefined,
+            select: false,
+        },
     },
     { timestamps: true }
 );

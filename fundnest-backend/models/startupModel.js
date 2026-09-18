@@ -4,13 +4,21 @@ const milestoneSchema = new mongoose.Schema(
     {
         title: { type: String, required: true, trim: true },
         description: { type: String, trim: true },
+        targetAmount: { type: Number, default: 0, min: 0 },
+        deliverableDescription: { type: String, trim: true },
+        proofUrl: { type: String, trim: true },
         targetDate: { type: Date },
         completedAt: { type: Date },
         status: {
             type: String,
-            enum: ['Pending', 'InProgress', 'Completed', 'Missed'],
+            enum: ['Pending', 'InProgress', 'Submitted', 'Verified', 'Rejected'],
             default: 'Pending',
         },
+        submissionNotes: { type: String, trim: true },
+        verifiedAt: { type: Date },
+        verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        verificationNotes: { type: String, trim: true },
+        releasedAmount: { type: Number, default: 0, min: 0 },
     },
     { _id: true, timestamps: true }
 );
@@ -114,6 +122,23 @@ const startupSchema = new mongoose.Schema(
         milestones: {
             type: [milestoneSchema],
             default: [],
+        },
+        // Escrow funds tracking
+        escrowBalance: {
+            type: Number,
+            default: 0,
+            min: [0, 'Escrow balance cannot be negative'],
+        },
+        releasedFunds: {
+            type: Number,
+            default: 0,
+            min: [0, 'Released funds cannot be negative'],
+        },
+        // Cached OpenAI text-embedding-3-small (1536 dims)
+        embedding: {
+            type: [Number],
+            default: undefined,
+            select: false,
         },
     },
     { timestamps: true }

@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated.watchlist'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
 import { Route as AuthenticatedStartupsRouteImport } from './routes/_authenticated.startups'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated.portfolio'
@@ -72,6 +73,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTransactionsRoute =
   AuthenticatedTransactionsRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/startups': typeof AuthenticatedStartupsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/watchlist': typeof AuthenticatedWatchlistRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/startups': typeof AuthenticatedAdminStartupsRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/startups': typeof AuthenticatedStartupsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/watchlist': typeof AuthenticatedWatchlistRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/startups': typeof AuthenticatedAdminStartupsRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
   '/_authenticated/startups': typeof AuthenticatedStartupsRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
+  '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/_authenticated/admin/startups': typeof AuthenticatedAdminStartupsRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/startups'
     | '/transactions'
+    | '/watchlist'
     | '/admin/dashboard'
     | '/admin/kyc'
     | '/admin/startups'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/startups'
     | '/transactions'
+    | '/watchlist'
     | '/admin/dashboard'
     | '/admin/kyc'
     | '/admin/startups'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portfolio'
     | '/_authenticated/startups'
     | '/_authenticated/transactions'
+    | '/_authenticated/watchlist'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/kyc'
     | '/_authenticated/admin/startups'
@@ -390,6 +402,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/watchlist': {
+      id: '/_authenticated/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof AuthenticatedWatchlistRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/transactions': {
       id: '/_authenticated/transactions'
@@ -510,6 +529,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
   AuthenticatedStartupsRoute: typeof AuthenticatedStartupsRoute
   AuthenticatedTransactionsRoute: typeof AuthenticatedTransactionsRoute
+  AuthenticatedWatchlistRoute: typeof AuthenticatedWatchlistRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminKycRoute: typeof AuthenticatedAdminKycRoute
   AuthenticatedAdminStartupsRoute: typeof AuthenticatedAdminStartupsRoute
@@ -529,6 +549,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
   AuthenticatedStartupsRoute: AuthenticatedStartupsRoute,
   AuthenticatedTransactionsRoute: AuthenticatedTransactionsRoute,
+  AuthenticatedWatchlistRoute: AuthenticatedWatchlistRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminKycRoute: AuthenticatedAdminKycRoute,
   AuthenticatedAdminStartupsRoute: AuthenticatedAdminStartupsRoute,

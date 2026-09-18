@@ -5,7 +5,7 @@ import axios from "axios";
 const baseURL =
   typeof window !== "undefined"
     ? "/api"
-    : ((import.meta as any).env?.VITE_API_URL ?? "http://localhost:8000/api");
+    : ((import.meta as any).env?.VITE_API_URL ?? "http://localhost:5000/api");
 
 export const api = axios.create({
   baseURL,
@@ -97,9 +97,13 @@ export const startupsApi = {
   update: (id: string, data: any) => api.put(`/startups/${id}`, data),
   getFounderAnalytics: () => api.get("/startups/analytics/founder"),
   getStartupAnalytics: (id: string) => api.get(`/startups/${id}/analytics`),
+  getMatches: (investorId?: string) => api.get(investorId ? `/startups/matches/${investorId}` : "/startups/matches"),
   addMilestone: (id: string, data: any) => api.post(`/startups/${id}/milestones`, data),
   updateMilestone: (id: string, milestoneId: string, data: any) => api.put(`/startups/${id}/milestones/${milestoneId}`, data),
   deleteMilestone: (id: string, milestoneId: string) => api.delete(`/startups/${id}/milestones/${milestoneId}`),
+  submitMilestone: (id: string, milestoneId: string, data: any) => api.post(`/startups/${id}/milestones/${milestoneId}/submit`, data),
+  verifyMilestone: (id: string, milestoneId: string, data?: any) => api.put(`/startups/${id}/milestones/${milestoneId}/verify`, data || {}),
+  rejectMilestone: (id: string, milestoneId: string, reason?: string) => api.put(`/startups/${id}/milestones/${milestoneId}/reject`, { reason }),
 };
 
 export const transactionsApi = {
@@ -108,7 +112,23 @@ export const transactionsApi = {
   list: (params?: { status?: string; startupId?: string }) => api.get("/transactions", { params }),
   get: (id: string) => api.get(`/transactions/${id}`),
   getPortfolio: () => api.get("/transactions/portfolio"),
+  getEscrowLedger: (startupId: string) => api.get(`/transactions/escrow-ledger/${startupId}`),
   cancel: (id: string) => api.delete(`/transactions/${id}`),
+};
+
+export const aiApi = {
+  chat: (data: { query: string; conversationHistory?: any[] }) => api.post("/ai/chat", data),
+  swot: (startupId: string, pitchText?: string) => api.post("/ai/swot-analysis", { startupId, pitchText }),
+  riskScore: (startupId: string) => api.post("/ai/risk-score", { startupId }),
+  summary: (startupId: string) => api.post("/ai/generate-summary", { startupId }),
+  analyzePitch: (startupId: string, pitchText?: string) => api.post("/ai/analyze-pitch", { startupId, pitchText }),
+  fundingReadiness: (startupId: string) => api.post("/ai/funding-readiness", { startupId }),
+  businessModel: (startupId: string) => api.post("/ai/business-model-analysis", { startupId }),
+  recommendation: (startupId: string) => api.post("/ai/investment-recommendation", { startupId }),
+  getReports: (startupId: string) => api.get(`/ai/reports/${startupId}`),
+  getRiskReports: (startupId: string) => api.get(`/ai/risk-reports/${startupId}`),
+  getStatus: () => api.get("/ai/status"),
+  configureKey: (apiKey: string) => api.post("/ai/configure-key", { apiKey }),
 };
 
 export const adminApi = {
@@ -126,6 +146,7 @@ export const investorApi = {
   getProfile: () => api.get("/investor/profile"),
   updateProfile: (data: any) => api.put("/investor/profile", data),
   getRecommendations: () => api.get("/investor/recommendations"),
+  getMatches: () => api.get("/startups/matches"),
   getWatchlist: () => api.get("/investor/watchlist"),
   addToWatchlist: (startupId: string) => api.post(`/investor/watchlist/${startupId}`),
   removeFromWatchlist: (startupId: string) => api.delete(`/investor/watchlist/${startupId}`),

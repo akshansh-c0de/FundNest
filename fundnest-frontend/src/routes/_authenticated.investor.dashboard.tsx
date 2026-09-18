@@ -100,7 +100,7 @@ function Page() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total invested" value={`$${stats.totalInvested.toLocaleString()}`} change={`${stats.totalInvestments} investments`} icon={<DollarSign className="h-4 w-4" />} />
         <StatCard label="Unique Startups" value={String(stats.uniqueStartups)} change="Diversification level" icon={<Activity className="h-4 w-4" />} />
-        <StatCard label="Pending Investments" value={String(transactions.filter((t: any) => t.status === "Pending").length)} change="Needs confirmation" icon={<TrendingUp className="h-4 w-4" />} accent={transactions.some((t: any) => t.status === "Pending") ? "warning" : "default"} />
+        <StatCard label="Pending Investments" value={String(transactions.filter((t: any) => t.status === "Pending").length)} change="Needs confirmation" icon={<TrendingUp className="h-4 w-4" />} accent={transactions.some((t: any) => t.status === "Pending") ? "warning" : "primary"} />
         <StatCard label="Platform yield" value="12.4%" change="Est. platform IRR" icon={<PieIcon className="h-4 w-4" />} accent="success" />
       </div>
 
@@ -216,7 +216,7 @@ function Page() {
                       <p className="text-xs text-muted-foreground">{s.sector} · {s.stage}</p>
                     </div>
                     <Link to={`/startups`}>
-                      <Button size="xs" variant="outline" className="text-xs py-1 px-2 h-7">
+                      <Button size="sm" variant="outline">
                         View
                       </Button>
                     </Link>

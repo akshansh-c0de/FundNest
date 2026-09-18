@@ -19,7 +19,7 @@ const transactionSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
+            enum: ['Pending', 'InEscrow', 'Completed', 'Released', 'Refunded', 'Failed'],
             default: 'Pending',
         },
         paymentMethod: {
@@ -32,6 +32,25 @@ const transactionSchema = new mongoose.Schema(
             unique: true,
             sparse: true,
         },
+        escrowHoldAmount: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        releasedAmount: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        releaseHistory: [
+            {
+                milestoneId: { type: mongoose.Schema.Types.ObjectId },
+                milestoneTitle: { type: String },
+                amount: { type: Number },
+                releasedAt: { type: Date, default: Date.now },
+                releasedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            },
+        ],
         transactionDate: {
             type: Date,
             default: Date.now,

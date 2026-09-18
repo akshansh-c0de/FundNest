@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Transaction from '../models/transactionModel.js';
 import Startup from '../models/startupModel.js';
 import User from '../models/userModel.js';
@@ -64,7 +65,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Complete a transaction (after payment confirmation)
+// @desc    Complete a transaction (funds moved into protected Escrow)
 // @route   PUT /api/transactions/:id/complete
 // @access  Private
 const completeTransaction = asyncHandler(async (req, res) => {
@@ -82,33 +83,64 @@ const completeTransaction = asyncHandler(async (req, res) => {
     }
 
     if (transaction.status !== 'Pending') {
-        throw new ApiError(400, 'Transaction is not in pending state');
+        throw new ApiError(400, `Transaction cannot be completed from '${transaction.status}' state`);
     }
 
-    // Update transaction status
-    transaction.status = 'Completed';
-    transaction.paymentId = paymentId;
-    await transaction.save();
+    // Optional MongoDB ACID session for atomicity (supports Atlas replica sets and standalone local Mongo)
+    let session = null;
+    try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+    } catch {
+        session = null;
+    }
 
-    // Update startup raised amount and investor count
-    const startup = await Startup.findById(transaction.startup);
-    if (startup) {
-        startup.raisedAmount += transaction.amount;
-        startup.investorsCount += 1;
-        
-        // Check if target is reached
+    try {
+        const sessionOpt = session ? { session } : {};
+
+        // 1. Move funds into InEscrow state
+        transaction.status = 'InEscrow';
+        transaction.paymentId = paymentId || `sim_${Date.now()}`;
+        transaction.escrowHoldAmount = transaction.amount;
+        await transaction.save(sessionOpt);
+
+        // 2. Atomically update startup funds and escrow balance
+        const startup = await Startup.findById(transaction.startup).session(session || null);
+        if (!startup) {
+            throw new ApiError(404, 'Associated startup not found');
+        }
+
+        // Check if this is a first-time backer
+        const priorTx = await Transaction.findOne({
+            startup: startup._id,
+            investor: transaction.investor,
+            status: { $in: ['InEscrow', 'Completed', 'Released'] },
+            _id: { $ne: transaction._id },
+        }).session(session || null);
+
+        if (!priorTx) {
+            startup.investorsCount = (startup.investorsCount || 0) + 1;
+        }
+
+        startup.raisedAmount = (startup.raisedAmount || 0) + transaction.amount;
+        startup.escrowBalance = (startup.escrowBalance || 0) + transaction.amount;
+
         if (startup.raisedAmount >= startup.targetAmount) {
             startup.status = 'Closed';
         }
-        
-        await startup.save();
+
+        await startup.save(sessionOpt);
+
+        if (session) {
+            await session.commitTransaction();
+        }
 
         // Notify founder
         await createNotification({
             userId: startup.founder,
             type: 'investment_received',
-            title: 'New Investment Received!',
-            message: `Congratulations! An investor just completed an investment of $${transaction.amount.toLocaleString()} in your startup "${startup.name}".`,
+            title: 'New Investment in Escrow!',
+            message: `Congratulations! An investment of $${transaction.amount.toLocaleString()} was completed for "${startup.name}" and is securely held in Escrow pending milestone delivery.`,
             refModel: 'Startup',
             refId: startup._id,
         });
@@ -117,18 +149,27 @@ const completeTransaction = asyncHandler(async (req, res) => {
         await createNotification({
             userId: transaction.investor,
             type: 'investment_completed',
-            title: 'Investment Confirmed',
-            message: `Your investment of $${transaction.amount.toLocaleString()} in "${startup.name}" has been successfully completed.`,
+            title: 'Investment Placed in Escrow',
+            message: `Your investment of $${transaction.amount.toLocaleString()} in "${startup.name}" is confirmed and safely held in Escrow.`,
             refModel: 'Transaction',
             refId: transaction._id,
         });
-    }
 
-    res.status(200).json({
-        success: true,
-        message: 'Transaction completed successfully',
-        transaction,
-    });
+        res.status(200).json({
+            success: true,
+            message: 'Transaction completed and funds moved to protected Escrow',
+            transaction,
+        });
+    } catch (err) {
+        if (session) {
+            await session.abortTransaction();
+        }
+        throw err;
+    } finally {
+        if (session) {
+            session.endSession();
+        }
+    }
 });
 
 // @desc    Get all transactions for current user
@@ -321,6 +362,57 @@ const getPortfolio = asyncHandler(async (req, res) => {
     });
 });
 
+// @desc    Get escrow ledger breakdown for a startup
+// @route   GET /api/transactions/escrow-ledger/:startupId
+// @access  Private
+const getEscrowLedger = asyncHandler(async (req, res) => {
+    const { startupId } = req.params;
+
+    const startup = await Startup.findById(startupId).select('name sector stage targetAmount raisedAmount escrowBalance releasedFunds milestones founder');
+    if (!startup) {
+        throw new ApiError(404, 'Startup not found');
+    }
+
+    const transactions = await Transaction.find({
+        startup: startupId,
+        status: { $in: ['InEscrow', 'Completed', 'Released'] },
+    })
+        .populate('investor', 'name email')
+        .sort({ createdAt: -1 });
+
+    const totalInEscrow = startup.escrowBalance || 0;
+    const totalReleased = startup.releasedFunds || 0;
+
+    res.status(200).json({
+        success: true,
+        ledger: {
+            startup: {
+                id: startup._id,
+                name: startup.name,
+                sector: startup.sector,
+                stage: startup.stage,
+                targetAmount: startup.targetAmount,
+                raisedAmount: startup.raisedAmount,
+                escrowBalance: totalInEscrow,
+                releasedFunds: totalReleased,
+            },
+            totalInEscrow,
+            totalReleased,
+            milestones: startup.milestones,
+            transactions: transactions.map(t => ({
+                id: t._id,
+                investor: t.investor?.name,
+                amount: t.amount,
+                status: t.status,
+                escrowHold: t.escrowHoldAmount || t.amount,
+                releasedAmount: t.releasedAmount || 0,
+                releaseHistory: t.releaseHistory,
+                date: t.transactionDate,
+            })),
+        },
+    });
+});
+
 export {
     createTransaction,
     completeTransaction,
@@ -330,4 +422,5 @@ export {
     getStartupTransactions,
     cancelTransaction,
     getPortfolio,
+    getEscrowLedger,
 };

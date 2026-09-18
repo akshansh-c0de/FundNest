@@ -124,7 +124,7 @@ function Page() {
       
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total users" value={stats.users.total.toLocaleString()} change={`+${stats.users.pendingKyc} pending KYC`} icon={<Users className="h-4 w-4" />} />
-        <StatCard label="Pending approvals" value={String(stats.startups.pending)} change="Startups waiting review" icon={<AlertCircle className="h-4 w-4" />} accent={stats.startups.pending > 0 ? "warning" : "default"} />
+        <StatCard label="Pending approvals" value={String(stats.startups.pending)} change="Startups waiting review" icon={<AlertCircle className="h-4 w-4" />} accent={stats.startups.pending > 0 ? "warning" : "primary"} />
         <StatCard label="Platform revenue" value={`$${stats.transactions.platformRevenue.toLocaleString()}`} change="2% flat fee on investments" icon={<DollarSign className="h-4 w-4" />} accent="success" />
         <StatCard label="Total investments" value={`$${stats.transactions.totalVolume.toLocaleString()}`} change={`${stats.transactions.completed} transactions`} icon={<TrendingUp className="h-4 w-4" />} />
       </div>

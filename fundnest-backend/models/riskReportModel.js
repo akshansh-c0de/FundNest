@@ -38,6 +38,18 @@ const riskReportSchema = new mongoose.Schema(
         }],
         // Mitigation Strategies
         mitigationStrategies: [{ type: String }],
+        // Qualitative OpenAI Narrative
+        riskNarrative: {
+            type: String,
+            required: [true, 'Risk narrative is required'],
+        },
+        // Structured Metrics Breakdown (from numerical risk engine)
+        metricsBreakdown: {
+            stageRisk: { type: mongoose.Schema.Types.Mixed },
+            tractionRisk: { type: mongoose.Schema.Types.Mixed },
+            teamRisk: { type: mongoose.Schema.Types.Mixed },
+            financialRisk: { type: mongoose.Schema.Types.Mixed },
+        },
         // Additional Analysis
         marketRisk: { type: Number, min: 0, max: 100 },
         technologyRisk: { type: Number, min: 0, max: 100 },

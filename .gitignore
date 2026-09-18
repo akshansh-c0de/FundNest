@@ -11,9 +11,15 @@ fundnest-frontend/.env
 # Nested git repos (Lovable workspace)
 fundnest-frontend/.workspace/
 
-# Build outputs
+# Build outputs and archives
 fundnest-frontend/.output/
 fundnest-frontend/dist/
+*.zip
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
 
 # OS / IDE artifacts
 .DS_Store
