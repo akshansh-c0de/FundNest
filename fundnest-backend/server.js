@@ -36,8 +36,13 @@ const app = express();
 app.use(helmet());
 
 // Hardened Dynamic CORS Configuration
+const configuredOrigins = (process.env.CLIENT_URL || '')
+    .split(',')
+    .map((u) => u.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
 const allowedOrigins = [
-    process.env.CLIENT_URL,
+    ...configuredOrigins,
     'http://localhost:5173',
     'http://localhost:8080',
     'http://localhost:3000',

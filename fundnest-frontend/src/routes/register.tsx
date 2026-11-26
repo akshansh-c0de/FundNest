@@ -13,7 +13,7 @@ export const Route = createFileRoute("/register")({
   component: RegisterPage,
 });
 
-const pwRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+const pwRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/;
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -26,8 +26,12 @@ function RegisterPage() {
     if (!pwRegex.test(form.password)) return toast.error("Password must be 8+ chars with upper, lower, number, special");
     setLoading(true);
     try {
-      await authApi.register(form);
-      toast.success("Account created — check your email to verify");
+      const res = await authApi.register(form);
+      toast.success(
+        res.data?.emailVerificationRequired
+          ? "Account created — check your email to verify"
+          : "Account created — you can now sign in"
+      );
       navigate({ to: "/login" });
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Registration failed");

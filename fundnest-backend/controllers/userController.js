@@ -2,10 +2,15 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import Session from '../models/sessionModel.js';
-import { sendTokenResponse, generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
+import {
+    sendTokenResponse,
+    generateAccessToken,
+    generateRefreshToken,
+    getRefreshCookieOptions,
+} from '../utils/generateToken.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import { sendEmail } from '../utils/emailService.js';
+import { sendEmail, isSmtpConfigured } from '../utils/emailService.js';
 import {
     generate2faSecret,
     generateQrCodeUri,
@@ -81,9 +86,15 @@ const registerUser = asyncHandler(async (req, res) => {
         console.error('Email verification sending failed: ', err.message);
     }
 
+    const emailVerificationRequired =
+        process.env.NODE_ENV !== 'development' && isSmtpConfigured();
+
     res.status(201).json({
         success: true,
-        message: 'Account created successfully. Please check your email to verify your account.',
+        emailVerificationRequired,
+        message: emailVerificationRequired
+            ? 'Account created successfully. Please check your email to verify your account.'
+            : 'Account created successfully. You can now sign in.',
         user: formatUser(user),
     });
 });
@@ -194,8 +205,8 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(403, 'Account has been deactivated');
     }
 
-    // Check email verification (skip in development mode)
-    if (process.env.NODE_ENV !== 'development' && !user.isEmailVerified) {
+    // Check email verification only when SMTP can actually deliver verification emails
+    if (process.env.NODE_ENV !== 'development' && isSmtpConfigured() && !user.isEmailVerified) {
         throw new ApiError(403, 'Please verify your email address before logging in. Check your inbox for the verification link.');
     }
 
@@ -279,11 +290,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             // Token was invalid/expired anyway
         }
 
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        });
+        res.clearCookie('refreshToken', getRefreshCookieOptions(req, false));
         throw new ApiError(401, 'Session has expired or token reuse detected. All sessions revoked.');
     }
 
@@ -294,11 +301,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     } catch (err) {
         // Token verification failed (expired or tampered)
         await session.deleteOne();
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        });
+        res.clearCookie('refreshToken', getRefreshCookieOptions(req, false));
         throw new ApiError(401, 'Invalid or expired refresh token');
     }
 
@@ -317,14 +320,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     session.lastActive = new Date();
     await session.save();
 
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: isProduction || req.secure || req.headers['x-forwarded-proto'] === 'https',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', newRefreshToken, getRefreshCookieOptions(req, true));
 
     res.status(200).json({
         success: true,
@@ -342,11 +338,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         await Session.deleteOne({ refreshToken });
     }
 
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https',
-        sameSite: 'strict',
-    });
+    res.clearCookie('refreshToken', getRefreshCookieOptions(req, false));
 
     res.status(200).json({
         success: true,
@@ -360,11 +352,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const logoutAllDevices = asyncHandler(async (req, res) => {
     await Session.deleteMany({ userId: req.user._id });
 
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https',
-        sameSite: 'strict',
-    });
+    res.clearCookie('refreshToken', getRefreshCookieOptions(req, false));
 
     res.status(200).json({
         success: true,
@@ -619,11 +607,7 @@ const revokeSession = asyncHandler(async (req, res) => {
     await session.deleteOne();
 
     if (isCurrentSession) {
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        });
+        res.clearCookie('refreshToken', getRefreshCookieOptions(req, false));
     }
 
     res.status(200).json({

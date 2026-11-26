@@ -3,8 +3,13 @@ import { Server } from 'socket.io';
 let io;
 
 export const initializeSocket = (server) => {
+    const configuredOrigins = (process.env.CLIENT_URL || '')
+        .split(',')
+        .map((u) => u.trim().replace(/\/+$/, ''))
+        .filter(Boolean);
+
     const allowedOrigins = [
-        process.env.CLIENT_URL,
+        ...configuredOrigins,
         'http://localhost:5173',
         'http://localhost:8080',
         'http://localhost:3000',

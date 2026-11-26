@@ -14,6 +14,28 @@ const generateRefreshToken = (userId) => {
     });
 };
 
+const getRefreshCookieOptions = (req, includeMaxAge = true) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isHttps = Boolean(
+        isProduction ||
+        req?.secure ||
+        req?.headers?.['x-forwarded-proto'] === 'https'
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: isHttps,
+        // Cross-origin deployments (e.g. Vercel -> Render/Railway) require SameSite=None over HTTPS.
+        sameSite: isHttps ? 'none' : 'lax',
+    };
+
+    if (includeMaxAge) {
+        options.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days matches refresh token expiry
+    }
+
+    return options;
+};
+
 const sendTokenResponse = async (user, statusCode, req, res) => {
     const accessToken = generateAccessToken(user._id, user.role);
     const refreshToken = generateRefreshToken(user._id);
@@ -29,17 +51,7 @@ const sendTokenResponse = async (user, statusCode, req, res) => {
         ipAddress,
     });
 
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    // Cookie configuration
-    const cookieOptions = {
-        httpOnly: true,
-        secure: isProduction || req.secure || req.headers['x-forwarded-proto'] === 'https',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days matches refresh token expiry
-    };
-
-    res.cookie('refreshToken', refreshToken, cookieOptions);
+    res.cookie('refreshToken', refreshToken, getRefreshCookieOptions(req, true));
 
     res.status(statusCode).json({
         success: true,
@@ -60,5 +72,5 @@ const sendTokenResponse = async (user, statusCode, req, res) => {
     });
 };
 
-export { generateAccessToken, generateRefreshToken, sendTokenResponse };
+export { generateAccessToken, generateRefreshToken, sendTokenResponse, getRefreshCookieOptions };
 export default generateAccessToken; // For backward compatibility

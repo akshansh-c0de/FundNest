@@ -1,12 +1,16 @@
 import nodemailer from 'nodemailer';
 
-const sendEmail = async ({ to, subject, text, html }) => {
-    // In production/development, check if we have SMTP details
-    const hasSmtp =
+const isSmtpConfigured = () =>
+    Boolean(
         process.env.SMTP_HOST &&
         process.env.SMTP_PORT &&
         process.env.SMTP_USER &&
-        process.env.SMTP_PASS;
+        process.env.SMTP_PASS
+    );
+
+const sendEmail = async ({ to, subject, text, html }) => {
+    // In production/development, check if we have SMTP details
+    const hasSmtp = isSmtpConfigured();
 
     if (!hasSmtp) {
         console.log('\n--- [EMAIL SERVICE MOCK] ---');
@@ -43,4 +47,4 @@ const sendEmail = async ({ to, subject, text, html }) => {
     return info;
 };
 
-export { sendEmail };
+export { sendEmail, isSmtpConfigured };
