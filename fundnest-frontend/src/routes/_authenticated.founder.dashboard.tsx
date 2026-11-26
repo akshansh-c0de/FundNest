@@ -102,11 +102,20 @@ function Page() {
               <div className="h-64">
                 <ResponsiveContainer>
                   <BarChart data={chartData} layout="vertical">
-                    <XAxis type="number" stroke="oklch(0.72 0.02 270)" fontSize={12} tickFormatter={(v) => `$${v / 1000}k`} />
-                    <YAxis type="category" dataKey="name" stroke="oklch(0.72 0.02 270)" fontSize={12} width={100} />
-                    <Tooltip formatter={(value) => `$${value.toLocaleString()}`} contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
-                    <Bar dataKey="target" fill="oklch(0.28 0.07 277)" radius={[0, 8, 8, 0]} name="Target" />
-                    <Bar dataKey="raised" fill="oklch(0.62 0.21 277)" radius={[0, 8, 8, 0]} name="Raised" />
+                    <XAxis type="number" stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
+                    <YAxis type="category" dataKey="name" stroke="oklch(0.48 0.02 260)" fontSize={12} width={100} tickLine={false} />
+                    <Tooltip
+                      formatter={(value) => `$${value.toLocaleString()}`}
+                      contentStyle={{
+                        backgroundColor: "var(--card)",
+                        color: "var(--foreground)",
+                        borderColor: "var(--border)",
+                        borderRadius: "12px",
+                        boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Bar dataKey="target" fill="oklch(0.85 0.05 277)" radius={[0, 8, 8, 0]} name="Target" />
+                    <Bar dataKey="raised" fill="oklch(0.55 0.22 277)" radius={[0, 8, 8, 0]} name="Raised" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

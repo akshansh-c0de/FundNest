@@ -49,20 +49,23 @@ class VectorStore:
     
     def search(self, query: str, k: int = 5) -> List[Tuple[str, dict, float]]:
         """Search for similar documents"""
+        if not self.documents or self.index.ntotal == 0:
+            return []
+
         embedding_service = get_embedding_service()
         query_embedding = embedding_service.get_embedding(query)
         query_embedding = np.array([query_embedding]).astype('float32')
-        
-        distances, indices = self.index.search(query_embedding, k)
-        
+
+        distances, indices = self.index.search(query_embedding, min(k, len(self.documents)))
+
         results = []
-        for i, (dist, idx) in enumerate(zip(distances[0], indices[0])):
-            if idx < len(self.documents):
+        for dist, idx in zip(distances[0], indices[0]):
+            if 0 <= idx < len(self.documents):
                 doc = self.documents[idx]
                 # Convert L2 distance to similarity score
-                similarity = 1 / (1 + dist)
+                similarity = float(1 / (1 + dist))
                 results.append((doc['text'], doc['metadata'], similarity))
-        
+
         return results
     
     def _save(self):

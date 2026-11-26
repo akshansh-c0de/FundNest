@@ -1,206 +1,227 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
-import { Bookmark, BookmarkCheck, Trash2, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { Bookmark, BookmarkCheck, Trash2, ArrowRight, ExternalLink } from "lucide-react";
+import { api, investorApi } from "@/lib/api";
+import { toast } from "sonner";
+import { Skeleton } from "./ui/skeleton";
 
 interface Startup {
-    _id: string;
-    name: string;
-    sector: string;
-    stage: string;
-    targetAmount: number;
-    raisedAmount: number;
-    logo: string;
+  _id: string;
+  name: string;
+  sector: string;
+  stage: string;
+  targetAmount: number;
+  raisedAmount: number;
+  logo?: string;
+  description?: string;
 }
 
 interface BookmarkItem {
-    _id: string;
-    startup: Startup;
-    notes?: string;
-    tags?: string[];
-    interestLevel: 'Low' | 'Medium' | 'High';
-    createdAt: string;
+  _id: string;
+  startup: Startup;
+  notes?: string;
+  tags?: string[];
+  interestLevel?: "Low" | "Medium" | "High";
+  createdAt?: string;
 }
 
 export function Watchlist() {
-    const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchBookmarks();
-    }, []);
-
-    const fetchBookmarks = async () => {
-        try {
-            const response = await fetch('/api/bookmarks', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch bookmarks');
-
-            const data = await response.json();
-            setBookmarks(data.bookmarks || []);
-        } catch (error) {
-            console.error('Error fetching bookmarks:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRemoveBookmark = async (bookmarkId: string) => {
-        try {
-            const response = await fetch(`/api/bookmarks/${bookmarkId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-
-            if (!response.ok) throw new Error('Failed to remove bookmark');
-
-            setBookmarks(prev => prev.filter(b => b._id !== bookmarkId));
-        } catch (error) {
-            console.error('Error removing bookmark:', error);
-        }
-    };
-
-    const getInterestColor = (level: string) => {
-        switch (level) {
-            case 'High': return 'bg-green-500';
-            case 'Medium': return 'bg-yellow-500';
-            case 'Low': return 'bg-orange-500';
-            default: return 'bg-gray-500';
-        }
-    };
-
-    const calculateProgress = (raised: number, target: number) => {
-        if (target === 0) return 0;
-        return Math.round((raised / target) * 100);
-    };
-
-    if (loading) {
-        return (
-            <Card>
-                <CardContent className="p-6">
-                    <div className="text-center text-muted-foreground">Loading watchlist...</div>
-                </CardContent>
-            </Card>
-        );
+  const fetchBookmarks = async () => {
+    try {
+      // First try /api/bookmarks
+      const res = await api.get("/bookmarks");
+      if (res.data?.bookmarks && res.data.bookmarks.length > 0) {
+        setBookmarks(res.data.bookmarks);
+      } else {
+        // Fall back to investor watchlist endpoint if any
+        const invRes = await investorApi.getWatchlist();
+        const list = invRes.data?.watchlist || [];
+        const formatted: BookmarkItem[] = list.map((item: any) => ({
+          _id: item._id,
+          startup: item,
+          interestLevel: "High",
+        }));
+        setBookmarks(formatted);
+      }
+    } catch (error) {
+      // Try investor watchlist as fallback
+      try {
+        const invRes = await investorApi.getWatchlist();
+        const list = invRes.data?.watchlist || [];
+        const formatted: BookmarkItem[] = list.map((item: any) => ({
+          _id: item._id,
+          startup: item,
+          interestLevel: "High",
+        }));
+        setBookmarks(formatted);
+      } catch (err) {
+        console.error("Error fetching bookmarks:", err);
+      }
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (bookmarks.length === 0) {
-        return (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Bookmark className="h-5 w-5" />
-                        Watchlist
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-center py-8 text-muted-foreground">
-                        <BookmarkCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>No startups in your watchlist yet.</p>
-                        <p className="text-sm mt-2">Bookmark startups to track them here.</p>
-                    </div>
-                </CardContent>
-            </Card>
-        );
+  useEffect(() => {
+    fetchBookmarks();
+  }, []);
+
+  const handleRemove = async (bookmark: BookmarkItem) => {
+    try {
+      try {
+        await api.delete(`/bookmarks/${bookmark._id}`);
+      } catch {
+        // If not found in /bookmarks, try investor watchlist endpoint
+        await investorApi.removeFromWatchlist(bookmark.startup?._id || bookmark._id);
+      }
+      setBookmarks((prev) => prev.filter((b) => b._id !== bookmark._id));
+      toast.success("Removed from watchlist");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to remove bookmark");
     }
+  };
 
+  const calculateProgress = (raised: number = 0, target: number = 1) => {
+    if (!target || target === 0) return 0;
+    return Math.min(100, Math.round((raised / target) * 100));
+  };
+
+  if (loading) {
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Bookmark className="h-5 w-5" />
-                    Watchlist
-                    <Badge variant="outline">{bookmarks.length}</Badge>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ScrollArea className="h-[600px]">
-                    <div className="space-y-4">
-                        {bookmarks.map((bookmark) => (
-                            <div
-                                key={bookmark._id}
-                                className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                            >
-                                <div className="flex items-start justify-between mb-2">
-                                    <div className="flex items-center gap-3">
-                                        <div className="text-2xl">{bookmark.startup.logo}</div>
-                                        <div>
-                                            <h4 className="font-semibold">{bookmark.startup.name}</h4>
-                                            <div className="flex gap-2 mt-1">
-                                                <Badge variant="outline" className="text-xs">
-                                                    {bookmark.startup.sector}
-                                                </Badge>
-                                                <Badge variant="outline" className="text-xs">
-                                                    {bookmark.startup.stage}
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleRemoveBookmark(bookmark._id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-
-                                <div className="mt-3 space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Funding Progress</span>
-                                        <span className="font-semibold">
-                                            {calculateProgress(bookmark.startup.raisedAmount, bookmark.startup.targetAmount)}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-secondary rounded-full h-2">
-                                        <div
-                                            className="bg-primary h-2 rounded-full transition-all"
-                                            style={{
-                                                width: `${calculateProgress(bookmark.startup.raisedAmount, bookmark.startup.targetAmount)}%`,
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                        <span>${(bookmark.startup.raisedAmount / 1000).toFixed(0)}K raised</span>
-                                        <span>of ${(bookmark.startup.targetAmount / 1000).toFixed(0)}K</span>
-                                    </div>
-                                </div>
-
-                                {bookmark.notes && (
-                                    <div className="mt-3 p-2 bg-muted rounded text-sm">
-                                        <span className="font-medium">Notes:</span> {bookmark.notes}
-                                    </div>
-                                )}
-
-                                <div className="mt-3 flex items-center gap-2">
-                                    <div className={`w-2 h-2 rounded-full ${getInterestColor(bookmark.interestLevel)}`} />
-                                    <span className="text-xs text-muted-foreground">
-                                        {bookmark.interestLevel} Interest
-                                    </span>
-                                </div>
-
-                                {bookmark.tags && bookmark.tags.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                        {bookmark.tags.map((tag, i) => (
-                                            <Badge key={i} variant="secondary" className="text-xs">
-                                                {tag}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </ScrollArea>
-            </CardContent>
-        </Card>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-56 rounded-2xl glass" />
+        ))}
+      </div>
     );
+  }
+
+  if (bookmarks.length === 0) {
+    return (
+      <div className="glass rounded-3xl p-16 text-center max-w-xl mx-auto border border-dashed border-border mt-6">
+        <div className="h-16 w-16 rounded-2xl bg-accent/60 grid place-items-center mx-auto mb-4">
+          <BookmarkCheck className="h-8 w-8 text-primary" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Your Watchlist is Empty</h3>
+        <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+          Keep track of promising startup investment opportunities. Bookmark deals from the startup marketplace to monitor their progress.
+        </p>
+        <Link to="/startups">
+          <Button className="btn-gradient inline-flex items-center gap-2">
+            <span>Explore Startups</span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-muted-foreground">Tracked Opportunities:</span>
+          <Badge variant="secondary" className="px-2.5 py-0.5 font-bold">
+            {bookmarks.length}
+          </Badge>
+        </div>
+        <Link to="/startups">
+          <Button variant="outline" size="sm" className="gap-2 text-xs">
+            <span>Browse More</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {bookmarks.map((bookmark) => {
+          const s = bookmark.startup || {};
+          const raised = s.raisedAmount || 0;
+          const target = s.targetAmount || 1;
+          const pct = calculateProgress(raised, target);
+
+          return (
+            <div
+              key={bookmark._id}
+              className="glass rounded-2xl p-6 flex flex-col justify-between hover:translate-y-[-2px] transition-all relative group"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl bg-accent/70 border border-border grid place-items-center text-2xl font-bold text-primary">
+                      {s.logo || s.name?.[0] || "🚀"}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-base leading-tight group-hover:text-primary transition-colors">
+                        {s.name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-[11px] px-1.5 py-0">
+                          {s.sector || "Tech"}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{s.stage || "Early"}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemove(bookmark)}
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                    title="Remove from watchlist"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {s.description && (
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
+                    {s.description}
+                  </p>
+                )}
+
+                {/* Progress bar */}
+                <div className="space-y-1.5 my-4">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="text-foreground">{pct}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div className="h-full btn-gradient transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>${(raised / 1000).toLocaleString()}K raised</span>
+                    <span>Goal: ${(target / 1000).toLocaleString()}K</span>
+                  </div>
+                </div>
+
+                {bookmark.notes && (
+                  <div className="mt-3 p-2.5 bg-muted/60 rounded-xl text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">Note:</span> {bookmark.notes}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 mt-2 border-t border-border flex items-center justify-between">
+                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Active Round
+                </span>
+                <Link to="/startups">
+                  <Button size="sm" className="btn-gradient text-xs h-8">
+                    View Deal
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

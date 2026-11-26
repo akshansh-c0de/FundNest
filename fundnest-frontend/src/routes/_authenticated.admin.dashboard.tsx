@@ -135,10 +135,18 @@ function Page() {
           <div className="h-64">
             <ResponsiveContainer>
               <LineChart data={growthData}>
-                <XAxis dataKey="month" stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <YAxis stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <Tooltip contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
-                <Line type="monotone" dataKey="users" stroke="oklch(0.62 0.21 277)" strokeWidth={2} dot={false} />
+                <XAxis dataKey="month" stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <YAxis stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--card)",
+                    color: "var(--foreground)",
+                    borderColor: "var(--border)",
+                    borderRadius: "12px",
+                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Line type="monotone" dataKey="users" stroke="oklch(0.55 0.22 277)" strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -158,7 +166,15 @@ function Page() {
                     {userBreakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Tooltip contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      color: "var(--foreground)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

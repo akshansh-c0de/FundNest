@@ -123,9 +123,17 @@ function Page() {
                       <stop offset="100%" stopColor="oklch(0.62 0.21 277)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="m" stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                  <YAxis stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                  <Tooltip contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
+                  <XAxis dataKey="m" stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                  <YAxis stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      color: "var(--foreground)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                    }}
+                  />
                   <Area type="monotone" dataKey="v" stroke="oklch(0.62 0.21 277)" strokeWidth={2} fill="url(#g1)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -147,8 +155,16 @@ function Page() {
                   <Pie data={allocationData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={2}>
                     {allocationData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
+                  <Tooltip
+                    formatter={(value) => `$${value.toLocaleString()}`}
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      color: "var(--foreground)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

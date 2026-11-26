@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { authApi, tokenStore } from "@/lib/api";
 import { useAuth, homeForRole } from "@/lib/auth";
 import { toast } from "sonner";
+import { UserCheck, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Sign in · FundNest" }] }),
@@ -19,6 +20,11 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const fillAndSubmit = (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +53,7 @@ function LoginPage() {
     <AuthShell
       title="Welcome back"
       subtitle="Sign in to your FundNest account"
-      footer={<>Don't have an account? <Link to="/register" className="text-foreground underline">Create one</Link></>}
+      footer={<>Don't have an account? <Link to="/register" className="text-primary hover:underline font-medium">Create one</Link></>}
     >
       <form onSubmit={submit} className="space-y-4">
         <div className="space-y-2">
@@ -64,6 +70,42 @@ function LoginPage() {
         <Button type="submit" disabled={loading} className="btn-gradient w-full">
           {loading ? "Signing in…" : "Sign in"}
         </Button>
+
+        {/* 1-Click Quick Demo Switcher */}
+        <div className="pt-3 mt-2 border-t border-border">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 text-center flex items-center justify-center gap-1.5">
+            <Sparkles className="h-3 w-3 text-primary" /> Test with a Demo Persona
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillAndSubmit("investor@fundnest.com", "password123")}
+              className="text-xs h-8 px-1 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+            >
+              Investor
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillAndSubmit("founder@fundnest.com", "password123")}
+              className="text-xs h-8 px-1 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+            >
+              Founder
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillAndSubmit("admin@fundnest.com", "password123")}
+              className="text-xs h-8 px-1 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+            >
+              Admin
+            </Button>
+          </div>
+        </div>
       </form>
     </AuthShell>
   );

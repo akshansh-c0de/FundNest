@@ -70,8 +70,9 @@ export function AIChat({ startupId, context, initialPrompt }: AIChatProps) {
 
   const handleSaveKey = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customKey.trim() || !customKey.trim().startsWith('sk-')) {
-      return toast.error('Please enter a valid OpenAI API key starting with sk-');
+    const trimmed = customKey.trim();
+    if (!trimmed || (!trimmed.startsWith('sk-') && !trimmed.startsWith('AIza') && !trimmed.startsWith('gsk_'))) {
+      return toast.error('Please enter a valid OpenAI (sk-), Gemini (AIza), or Groq (gsk_) API key');
     }
 
     setSavingKey(true);
@@ -145,7 +146,7 @@ export function AIChat({ startupId, context, initialPrompt }: AIChatProps) {
           </div>
 
           {/* Engine Status Indicator */}
-          {aiStatus?.configured ? (
+          {aiStatus?.configured && aiStatus?.mode === 'live' ? (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-400 font-mono">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Real-time ({aiStatus.chatModel})</span>
@@ -157,7 +158,7 @@ export function AIChat({ startupId, context, initialPrompt }: AIChatProps) {
               onClick={() => setKeyModalOpen(true)}
               className="h-7 text-xs px-2.5 text-amber-400 border-amber-500/30 hover:bg-amber-500/10 flex items-center gap-1"
             >
-              <Key className="h-3 w-3" /> Connect Key
+              <Key className="h-3 w-3" /> {aiStatus?.mode === 'quota_exhausted' ? 'Quota Exhausted · Update Key' : 'Connect Key'}
             </Button>
           )}
         </CardTitle>

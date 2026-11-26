@@ -102,8 +102,16 @@ function Page() {
                   <Pie data={allocationData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={80}>
                     {allocationData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
+                  <Tooltip
+                    formatter={(value) => `$${value.toLocaleString()}`}
+                    contentStyle={{
+                      backgroundColor: "var(--card)",
+                      color: "var(--foreground)",
+                      borderColor: "var(--border)",
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

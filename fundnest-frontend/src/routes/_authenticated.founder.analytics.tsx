@@ -28,11 +28,19 @@ function Page() {
           <div className="h-64">
             <ResponsiveContainer>
               <LineChart data={traffic}>
-                <XAxis dataKey="m" stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <YAxis stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <Tooltip contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
-                <Line type="monotone" dataKey="views" stroke="oklch(0.62 0.21 277)" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="clicks" stroke="oklch(0.62 0.22 305)" strokeWidth={2} dot={false} />
+                <XAxis dataKey="m" stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <YAxis stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--card)",
+                    color: "var(--foreground)",
+                    borderColor: "var(--border)",
+                    borderRadius: "12px",
+                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Line type="monotone" dataKey="views" stroke="oklch(0.55 0.22 277)" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="clicks" stroke="oklch(0.58 0.22 305)" strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -42,10 +50,18 @@ function Page() {
           <div className="h-64">
             <ResponsiveContainer>
               <BarChart data={mockGrowth}>
-                <XAxis dataKey="m" stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <YAxis stroke="oklch(0.72 0.02 270)" fontSize={12} />
-                <Tooltip contentStyle={{ background: "oklch(0.17 0.04 270)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} />
-                <Bar dataKey="v" fill="oklch(0.62 0.21 277)" radius={[8, 8, 0, 0]} />
+                <XAxis dataKey="m" stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <YAxis stroke="oklch(0.48 0.02 260)" fontSize={12} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--card)",
+                    color: "var(--foreground)",
+                    borderColor: "var(--border)",
+                    borderRadius: "12px",
+                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Bar dataKey="v" fill="oklch(0.55 0.22 277)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

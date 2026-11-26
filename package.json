@@ -1,0 +1,15 @@
+{
+  "name": "fundnest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FundNest monorepo runner scripts",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:backend": "npm --prefix fundnest-backend run dev",
+    "dev:frontend": "npm --prefix fundnest-frontend run dev",
+    "dev:ai": "python -m uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir fundnest-ai",
+    "build": "npm --prefix fundnest-frontend run build",
+    "test:backend": "npm --prefix fundnest-backend exec node test_platform_e2e.js"
+  }
+}
+

@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
-
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth";
+import { ThemeProvider, useTheme } from "../lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -24,15 +25,16 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  const message = error instanceof Error ? error.message : String(error ?? "Unexpected error");
   useEffect(() => { reportLovableError(error, { boundary: "tanstack_root_error_component" }); }, [error]);
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="glass rounded-2xl p-10 max-w-md text-center">
         <h1 className="text-xl font-semibold">Something went wrong</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button onClick={() => { router.invalidate(); reset(); }} className="btn-gradient rounded-md px-4 py-2 text-sm font-medium">Try again</button>
           <a href="/" className="rounded-md border border-border px-4 py-2 text-sm">Home</a>
@@ -69,10 +71,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="theme-mixed">
       <head><HeadContent /></head>
       <body>{children}<Scripts /></body>
     </html>
+  );
+}
+
+function InnerRoot() {
+  const { theme } = useTheme();
+  return (
+    <>
+      <Outlet />
+      <Toaster richColors theme={theme === "dark" ? "dark" : "light"} position="top-right" />
+    </>
   );
 }
 
@@ -80,10 +92,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster richColors theme="dark" position="top-right" />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <InnerRoot />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
+

@@ -9,55 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerifyEmailRouteImport } from './routes/verify-email'
-import { Route as Verify2faRouteImport } from './routes/verify-2fa'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated.watchlist'
-import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
-import { Route as AuthenticatedStartupsRouteImport } from './routes/_authenticated.startups'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as Verify2faRouteImport } from './routes/verify-2fa'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated.portfolio'
-import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated.settings.index'
-import { Route as AuthenticatedSettingsTwoFactorRouteImport } from './routes/_authenticated.settings.two-factor'
-import { Route as AuthenticatedSettingsSessionsRouteImport } from './routes/_authenticated.settings.sessions'
-import { Route as AuthenticatedSettingsSecurityRouteImport } from './routes/_authenticated.settings.security'
-import { Route as AuthenticatedInvestorDashboardRouteImport } from './routes/_authenticated.investor.dashboard'
-import { Route as AuthenticatedFounderDashboardRouteImport } from './routes/_authenticated.founder.dashboard'
-import { Route as AuthenticatedFounderCreateStartupRouteImport } from './routes/_authenticated.founder.create-startup'
-import { Route as AuthenticatedFounderCampaignsRouteImport } from './routes/_authenticated.founder.campaigns'
-import { Route as AuthenticatedFounderAnalyticsRouteImport } from './routes/_authenticated.founder.analytics'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
-import { Route as AuthenticatedAdminStartupsRouteImport } from './routes/_authenticated.admin.startups'
-import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
+import { Route as AuthenticatedStartupsRouteImport } from './routes/_authenticated.startups'
+import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
+import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated.watchlist'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated.admin.dashboard'
+import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
+import { Route as AuthenticatedAdminStartupsRouteImport } from './routes/_authenticated.admin.startups'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
+import { Route as AuthenticatedFounderAnalyticsRouteImport } from './routes/_authenticated.founder.analytics'
+import { Route as AuthenticatedFounderCampaignsRouteImport } from './routes/_authenticated.founder.campaigns'
+import { Route as AuthenticatedFounderCreateStartupRouteImport } from './routes/_authenticated.founder.create-startup'
+import { Route as AuthenticatedFounderDashboardRouteImport } from './routes/_authenticated.founder.dashboard'
+import { Route as AuthenticatedInvestorDashboardRouteImport } from './routes/_authenticated.investor.dashboard'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated.settings.index'
+import { Route as AuthenticatedSettingsSecurityRouteImport } from './routes/_authenticated.settings.security'
+import { Route as AuthenticatedSettingsSessionsRouteImport } from './routes/_authenticated.settings.sessions'
+import { Route as AuthenticatedSettingsTwoFactorRouteImport } from './routes/_authenticated.settings.two-factor'
 
-const VerifyEmailRoute = VerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Verify2faRoute = Verify2faRouteImport.update({
-  id: '/verify-2fa',
-  path: '/verify-2fa',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -65,18 +49,39 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
-  id: '/watchlist',
-  path: '/watchlist',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Verify2faRoute = Verify2faRouteImport.update({
+  id: '/verify-2fa',
+  path: '/verify-2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedStartupsRoute = AuthenticatedStartupsRouteImport.update({
+  id: '/startups',
+  path: '/startups',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTransactionsRoute =
@@ -85,73 +90,20 @@ const AuthenticatedTransactionsRoute =
     path: '/transactions',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedStartupsRoute = AuthenticatedStartupsRouteImport.update({
-  id: '/startups',
-  path: '/startups',
+const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsIndexRoute =
-  AuthenticatedSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin/dashboard',
+    path: '/admin/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedSettingsTwoFactorRoute =
-  AuthenticatedSettingsTwoFactorRouteImport.update({
-    id: '/settings/two-factor',
-    path: '/settings/two-factor',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedSettingsSessionsRoute =
-  AuthenticatedSettingsSessionsRouteImport.update({
-    id: '/settings/sessions',
-    path: '/settings/sessions',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedSettingsSecurityRoute =
-  AuthenticatedSettingsSecurityRouteImport.update({
-    id: '/settings/security',
-    path: '/settings/security',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedInvestorDashboardRoute =
-  AuthenticatedInvestorDashboardRouteImport.update({
-    id: '/investor/dashboard',
-    path: '/investor/dashboard',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedFounderDashboardRoute =
-  AuthenticatedFounderDashboardRouteImport.update({
-    id: '/founder/dashboard',
-    path: '/founder/dashboard',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedFounderCreateStartupRoute =
-  AuthenticatedFounderCreateStartupRouteImport.update({
-    id: '/founder/create-startup',
-    path: '/founder/create-startup',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedFounderCampaignsRoute =
-  AuthenticatedFounderCampaignsRouteImport.update({
-    id: '/founder/campaigns',
-    path: '/founder/campaigns',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedFounderAnalyticsRoute =
-  AuthenticatedFounderAnalyticsRouteImport.update({
-    id: '/founder/analytics',
-    path: '/founder/analytics',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
+const AuthenticatedAdminKycRoute = AuthenticatedAdminKycRouteImport.update({
+  id: '/admin/kyc',
+  path: '/admin/kyc',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminStartupsRoute =
@@ -160,15 +112,63 @@ const AuthenticatedAdminStartupsRoute =
     path: '/admin/startups',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedAdminKycRoute = AuthenticatedAdminKycRouteImport.update({
-  id: '/admin/kyc',
-  path: '/admin/kyc',
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAdminDashboardRoute =
-  AuthenticatedAdminDashboardRouteImport.update({
-    id: '/admin/dashboard',
-    path: '/admin/dashboard',
+const AuthenticatedFounderAnalyticsRoute =
+  AuthenticatedFounderAnalyticsRouteImport.update({
+    id: '/founder/analytics',
+    path: '/founder/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFounderCampaignsRoute =
+  AuthenticatedFounderCampaignsRouteImport.update({
+    id: '/founder/campaigns',
+    path: '/founder/campaigns',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFounderCreateStartupRoute =
+  AuthenticatedFounderCreateStartupRouteImport.update({
+    id: '/founder/create-startup',
+    path: '/founder/create-startup',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFounderDashboardRoute =
+  AuthenticatedFounderDashboardRouteImport.update({
+    id: '/founder/dashboard',
+    path: '/founder/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInvestorDashboardRoute =
+  AuthenticatedInvestorDashboardRouteImport.update({
+    id: '/investor/dashboard',
+    path: '/investor/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsSecurityRoute =
+  AuthenticatedSettingsSecurityRouteImport.update({
+    id: '/settings/security',
+    path: '/settings/security',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsSessionsRoute =
+  AuthenticatedSettingsSessionsRouteImport.update({
+    id: '/settings/sessions',
+    path: '/settings/sessions',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsTwoFactorRoute =
+  AuthenticatedSettingsTwoFactorRouteImport.update({
+    id: '/settings/two-factor',
+    path: '/settings/two-factor',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -347,46 +347,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verify-email': {
-      id: '/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof VerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify-2fa': {
-      id: '/verify-2fa'
-      path: '/verify-2fa'
-      fullPath: '/verify-2fa'
-      preLoaderRoute: typeof Verify2faRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -396,25 +361,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/watchlist': {
-      id: '/_authenticated/watchlist'
-      path: '/watchlist'
-      fullPath: '/watchlist'
-      preLoaderRoute: typeof AuthenticatedWatchlistRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/transactions': {
-      id: '/_authenticated/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-2fa': {
+      id: '/verify-2fa'
+      path: '/verify-2fa'
+      fullPath: '/verify-2fa'
+      preLoaderRoute: typeof Verify2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/portfolio': {
+      id: '/_authenticated/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/startups': {
@@ -424,88 +417,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStartupsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/portfolio': {
-      id: '/_authenticated/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
+    '/_authenticated/transactions': {
+      id: '/_authenticated/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings/': {
-      id: '/_authenticated/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+    '/_authenticated/watchlist': {
+      id: '/_authenticated/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof AuthenticatedWatchlistRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings/two-factor': {
-      id: '/_authenticated/settings/two-factor'
-      path: '/settings/two-factor'
-      fullPath: '/settings/two-factor'
-      preLoaderRoute: typeof AuthenticatedSettingsTwoFactorRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/settings/sessions': {
-      id: '/_authenticated/settings/sessions'
-      path: '/settings/sessions'
-      fullPath: '/settings/sessions'
-      preLoaderRoute: typeof AuthenticatedSettingsSessionsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/settings/security': {
-      id: '/_authenticated/settings/security'
-      path: '/settings/security'
-      fullPath: '/settings/security'
-      preLoaderRoute: typeof AuthenticatedSettingsSecurityRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/investor/dashboard': {
-      id: '/_authenticated/investor/dashboard'
-      path: '/investor/dashboard'
-      fullPath: '/investor/dashboard'
-      preLoaderRoute: typeof AuthenticatedInvestorDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/founder/dashboard': {
-      id: '/_authenticated/founder/dashboard'
-      path: '/founder/dashboard'
-      fullPath: '/founder/dashboard'
-      preLoaderRoute: typeof AuthenticatedFounderDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/founder/create-startup': {
-      id: '/_authenticated/founder/create-startup'
-      path: '/founder/create-startup'
-      fullPath: '/founder/create-startup'
-      preLoaderRoute: typeof AuthenticatedFounderCreateStartupRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/founder/campaigns': {
-      id: '/_authenticated/founder/campaigns'
-      path: '/founder/campaigns'
-      fullPath: '/founder/campaigns'
-      preLoaderRoute: typeof AuthenticatedFounderCampaignsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/founder/analytics': {
-      id: '/_authenticated/founder/analytics'
-      path: '/founder/analytics'
-      fullPath: '/founder/analytics'
-      preLoaderRoute: typeof AuthenticatedFounderAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/startups': {
-      id: '/_authenticated/admin/startups'
-      path: '/admin/startups'
-      fullPath: '/admin/startups'
-      preLoaderRoute: typeof AuthenticatedAdminStartupsRouteImport
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/kyc': {
@@ -515,11 +445,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminKycRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin/dashboard': {
-      id: '/_authenticated/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+    '/_authenticated/admin/startups': {
+      id: '/_authenticated/admin/startups'
+      path: '/admin/startups'
+      fullPath: '/admin/startups'
+      preLoaderRoute: typeof AuthenticatedAdminStartupsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/founder/analytics': {
+      id: '/_authenticated/founder/analytics'
+      path: '/founder/analytics'
+      fullPath: '/founder/analytics'
+      preLoaderRoute: typeof AuthenticatedFounderAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/founder/campaigns': {
+      id: '/_authenticated/founder/campaigns'
+      path: '/founder/campaigns'
+      fullPath: '/founder/campaigns'
+      preLoaderRoute: typeof AuthenticatedFounderCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/founder/create-startup': {
+      id: '/_authenticated/founder/create-startup'
+      path: '/founder/create-startup'
+      fullPath: '/founder/create-startup'
+      preLoaderRoute: typeof AuthenticatedFounderCreateStartupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/founder/dashboard': {
+      id: '/_authenticated/founder/dashboard'
+      path: '/founder/dashboard'
+      fullPath: '/founder/dashboard'
+      preLoaderRoute: typeof AuthenticatedFounderDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/investor/dashboard': {
+      id: '/_authenticated/investor/dashboard'
+      path: '/investor/dashboard'
+      fullPath: '/investor/dashboard'
+      preLoaderRoute: typeof AuthenticatedInvestorDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/security': {
+      id: '/_authenticated/settings/security'
+      path: '/settings/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof AuthenticatedSettingsSecurityRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/sessions': {
+      id: '/_authenticated/settings/sessions'
+      path: '/settings/sessions'
+      fullPath: '/settings/sessions'
+      preLoaderRoute: typeof AuthenticatedSettingsSessionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/two-factor': {
+      id: '/_authenticated/settings/two-factor'
+      path: '/settings/two-factor'
+      fullPath: '/settings/two-factor'
+      preLoaderRoute: typeof AuthenticatedSettingsTwoFactorRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
