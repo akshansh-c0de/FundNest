@@ -34,7 +34,7 @@ function RegisterPage() {
       );
       navigate({ to: "/login" });
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || err.message || "Registration failed");
     } finally {
       setLoading(false);
     }

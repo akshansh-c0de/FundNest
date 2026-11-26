@@ -43,7 +43,7 @@ function LoginPage() {
       toast.success("Welcome back!");
       navigate({ to: homeForRole(res.data.user?.role) });
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || err.message || "Login failed");
     } finally {
       setLoading(false);
     }
