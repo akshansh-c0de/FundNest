@@ -12,6 +12,8 @@ fundnest-frontend/.env
 fundnest-frontend/.workspace/
 
 # Build outputs and archives
+.vercel/
+fundnest-frontend/.vercel/
 fundnest-frontend/.output/
 fundnest-frontend/dist/
 *.zip

@@ -1,11 +1,13 @@
 import axios from "axios";
 
-// In the browser, use a relative path so Vite's dev proxy forwards /api → http://localhost:8000/api.
-// On the server (SSR/production), fall back to the absolute VITE_API_URL env variable.
+// In browser dev mode, use a relative path so Vite's dev proxy forwards /api → http://localhost:5000/api.
+// In production or SSR, use VITE_API_URL if configured.
+const viteApiUrl = (import.meta as any).env?.VITE_API_URL;
+const isDev = (import.meta as any).env?.DEV;
 const baseURL =
-  typeof window !== "undefined"
+  typeof window !== "undefined" && isDev
     ? "/api"
-    : ((import.meta as any).env?.VITE_API_URL ?? "http://localhost:5000/api");
+    : (viteApiUrl ?? (typeof window !== "undefined" ? "/api" : "http://localhost:5000/api"));
 
 export const api = axios.create({
   baseURL,
