@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm --prefix fundnest-frontend install",
-  "buildCommand": "node scripts/vercel-build.mjs"
+  "installCommand": "node -e \"const fs=require('fs'),cp=require('child_process');const d=fs.existsSync('fundnest-frontend/package.json')?'fundnest-frontend':'.';cp.execSync('npm install',{cwd:d,stdio:'inherit'})\"",
+  "buildCommand": "node -e \"const fs=require('fs'),cp=require('child_process');if(fs.existsSync('scripts/vercel-build.mjs')){cp.execSync('node scripts/vercel-build.mjs',{stdio:'inherit'})}else{cp.execSync('npm run build',{stdio:'inherit',env:{...process.env,VERCEL:'1'}})}\""
 }
-
